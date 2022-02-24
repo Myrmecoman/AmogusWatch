@@ -1,6 +1,7 @@
 # main.py -- put your code here!
 # CTRL-D to reboot
 
+import watch
 import pyb
 import machine
 import ssd1306
