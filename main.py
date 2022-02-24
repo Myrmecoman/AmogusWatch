@@ -40,5 +40,5 @@ def SPO2on():
     ch.pulse_width_percent(50)
 
 
-#LCDamogus()
-SPO2on()
+amogus.LCDamogus()
+#SPO2on()
