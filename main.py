@@ -7,6 +7,8 @@ import machine
 import ssd1306
 from pyb import ADC
 
+i2c = machine.SoftI2C(scl=machine.Pin('B8'), sda=machine.Pin('B9'))
+oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
 def LEDsOn():
     pyb.LED(1).on()
@@ -19,25 +21,14 @@ def LEDsOff():
     pyb.LED(3).off()
 
 def LCD(text):
-    i2c = machine.SoftI2C(scl=machine.Pin('B8'), sda=machine.Pin('B9'))
-
-    # display things
-    oled = ssd1306.SSD1306_I2C(128, 64, i2c)
     oled.fill(0)
     oled.text(text, 0, 0)
     oled.show()
 
 def ClearLCD():
-    i2c = machine.SoftI2C(scl=machine.Pin('B8'), sda=machine.Pin('B9'))
-
-    # display things
-    oled = ssd1306.SSD1306_I2C(128, 64, i2c)
     oled.fill(0)
 
 def LCDamogus():
-    i2c = machine.SoftI2C(scl=machine.Pin('B8'), sda=machine.Pin('B9'))    
-    # display things
-    oled = ssd1306.SSD1306_I2C(128, 64, i2c)
     oled.fill(0)
 
     offset_x = 50
