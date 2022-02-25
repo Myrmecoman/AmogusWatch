@@ -2,6 +2,7 @@
 # CTRL-D to reboot
 
 import watch
+import plot
 import amogus
 #import _thread # can't import for some reason
 import pyb
@@ -52,11 +53,12 @@ backGroundNoise = 0
 while True:
     if isPair == 0:
         volt.value(0)
-        time.sleep(0.05)
+        time.sleep(0.005)
         backGroundNoise = ADC('A1').read()
     else:
         volt.value(1)
-        time.sleep(0.05)
-        print(ADC('A1').read() - backGroundNoise)
+        time.sleep(0.005)
+        plot.AddValue(ADC('A1').read() - backGroundNoise)
+        plot.DisplayValues()
     isPair += 1
     isPair = isPair % 2
