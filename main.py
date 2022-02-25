@@ -3,9 +3,11 @@
 
 import watch
 import amogus
+#import _thread # can't import for some reason
 import pyb
 import machine
 import ssd1306
+import time
 from pyb import ADC
 from pyb import Pin
 
@@ -34,11 +36,27 @@ def ClearLCD():
     global oled
     oled.fill(0)
 
-def SPO2on():
+def PrepareSPO2():
     pa7 = machine.Pin('A7', machine.Pin.OUT)
     pa7.value(1)
     pa1 = Pin('A1', Pin.IN, Pin.PULL_UP)
-    #pa6 = Pin('A6', Pin.IN, Pin.PULL_DOWN) // put output on ground
+    #pa6 = Pin('A6', Pin.IN, Pin.PULL_DOWN) # put output on ground
+    return pa7
+
 
 amogus.LCDamogus()
-SPO2on()
+volt = PrepareSPO2()
+
+isPair = 0
+backGroundNoise = 0
+while True:
+    if isPair == 0:
+        volt.value(0)
+        time.sleep(0.05)
+        backGroundNoise = ADC('A1').read()
+    else:
+        volt.value(1)
+        time.sleep(0.05)
+        print(ADC('A1').read() - backGroundNoise)
+    isPair += 1
+    isPair = isPair % 2
