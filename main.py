@@ -7,6 +7,7 @@ import pyb
 import machine
 import ssd1306
 from pyb import ADC
+from pyb import Pin
 
 
 i2c = machine.SoftI2C(scl=machine.Pin('B8'), sda=machine.Pin('B9'))
@@ -34,11 +35,10 @@ def ClearLCD():
     oled.fill(0)
 
 def SPO2on():
-    p = pyb.Pin('A7')
-    tim = pyb.Timer(1, freq=1)
-    ch = tim.channel(1, pyb.Timer.PWM, pin=p)
-    ch.pulse_width_percent(50)
-
+    pa7 = machine.Pin('A7', machine.Pin.OUT)
+    pa7.value(1)
+    pa1 = Pin('A1', Pin.IN, Pin.PULL_UP)
+    #pa6 = Pin('A6', Pin.IN, Pin.PULL_DOWN) // put output on ground
 
 amogus.LCDamogus()
-#SPO2on()
+SPO2on()
