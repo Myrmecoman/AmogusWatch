@@ -1,22 +1,16 @@
 import main
-import utime as time
+import time
+import machine 
 
-now = time.time()
-tm = time.localtime(now)
-yearMonthDay = str(tm[0]) + ':' + str(tm[1]) + ':' + str(tm[2])
-hourMinuteSec = str(tm[3]) + ':' + str(tm[4]) + ':' + str(tm[5])
-
-def UpdateTime():
-    global yearMonthDay
-    yearMonthDay = str(tm[0]) + ':' + str(tm[1]) + ':' + str(tm[2])
-    global hourMinuteSec
-    hourMinuteSec = str(tm[3]) + ':' + str(tm[4]) + ':' + str(tm[5])
+now = (2020, 1, 21, 2, 10, 32, 36, 0)
 
 def ShowTime():
+    rtc = machine.RTC()
+    rtc.datetime(now)
     while True:
-        UpdateTime()
         main.oled.fill(0)
-        global hourMinuteSec
-        main.oled.text(hourMinuteSec, 0, 0)
+        t = rtc.datetime()
+        main.oled.text(str(t[4]) + ":" + str(t[5]) + ":" + str(t[6]), 0, 0)
         main.oled.show()
+        time.sleep(0.1)
 

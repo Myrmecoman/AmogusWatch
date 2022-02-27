@@ -48,17 +48,18 @@ def PrepareSPO2():
 amogus.LCDamogus()
 volt = PrepareSPO2()
 
-isPair = 0
-backGroundNoise = 0
-while True:
-    if isPair == 0:
-        volt.value(0)
-        time.sleep(0.005)
-        backGroundNoise = ADC('A1').read()
-    else:
-        volt.value(1)
-        time.sleep(0.005)
-        plot.AddValue(ADC('A1').read() - backGroundNoise)
-        plot.DisplayValues()
-    isPair += 1
-    isPair = isPair % 2
+def graph():
+    isPair = 0
+    backGroundNoise = 0
+    while True:
+        if isPair == 0:
+            volt.value(0)
+            time.sleep(0.005)
+            backGroundNoise = ADC('A1').read()
+        else:
+            volt.value(1)
+            time.sleep(0.005)
+            plot.AddValue(ADC('A1').read() - backGroundNoise)
+            plot.DisplayValues()
+        isPair += 1
+        isPair = isPair % 2
