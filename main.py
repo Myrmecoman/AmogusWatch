@@ -44,12 +44,11 @@ def PrepareSPO2():
     #pa6 = Pin('A6', Pin.IN, Pin.PULL_DOWN) # put output on ground
     return pa7
 
-
-amogus.LCDamogus()
-
 def graph():
     volt = PrepareSPO2()
     isPair = 0
+    loopBeforeDisplay = 10
+    loopNb = 0
     backGroundNoise = 0
     while True:
         if isPair == 0:
@@ -60,6 +59,13 @@ def graph():
             volt.value(1)
             time.sleep(0.005)
             plot.AddValue(ADC('A1').read() - backGroundNoise)
-            plot.DisplayValues()
+            if loopNb <= 1:
+                plot.DisplayValues()
+        loopNb += 1
+        loopNb = loopNb % loopBeforeDisplay
         isPair += 1
         isPair = isPair % 2
+
+
+amogus.LCDamogus()
+graph()
