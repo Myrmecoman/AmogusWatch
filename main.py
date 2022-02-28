@@ -46,9 +46,9 @@ def PrepareSPO2():
 
 
 amogus.LCDamogus()
-volt = PrepareSPO2()
 
 def graph():
+    volt = PrepareSPO2()
     isPair = 0
     backGroundNoise = 0
     while True:
