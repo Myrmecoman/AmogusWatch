@@ -7,15 +7,6 @@ def AddValue(val):
     if len(values) > 120:
         del values[0]
 
-def DrawLine(x0, y0, y1):
-    start = y0
-    end = y1
-    if y1 < y0:
-        start = y1
-        end = y0
-    for i in range(start, end + 1):
-        main.oled.pixel(x0, i, 1)
-
 def DisplayValues():
     main.oled.fill(0)
     min = 1000000
@@ -36,6 +27,6 @@ def DisplayValues():
         y0 = ((values[i] - min)/maxSpread) * 60
         y1 = ((values[i + 1] - min)/maxSpread) * 60
         x = x + 1
-        DrawLine(int(x), int(y0), int(y1))
+        main.oled.line(int(x), int(y0), int(x) + 1, int(y1), 1)
     
     main.oled.show()
