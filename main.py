@@ -13,27 +13,15 @@ from pyb import ADC
 from pyb import Pin
 
 
+now = (2020, 1, 21, 2, 10, 32, 36, 0)
+rtc = machine.RTC()
+rtc.datetime(now)
+lastCall = rtc.datetime()
+
 menuSelected = 0
-lastCall = watch.rtc.datetime()
 i2c = machine.SoftI2C(scl=machine.Pin('B8'), sda=machine.Pin('B9'))
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
-
-def LEDsOn():
-    pyb.LED(1).on()
-    pyb.LED(2).on()
-    pyb.LED(3).on()
-
-def LEDsOff():
-    pyb.LED(1).off()
-    pyb.LED(2).off()
-    pyb.LED(3).off()
-
-def LCDtext(text):
-    global oled
-    oled.fill(0)
-    oled.text(text, 0, 0)
-    oled.show()
 
 def ClearLCD():
     global oled
@@ -44,15 +32,38 @@ def PrepareSPO2():
     pa7.value(1)
     pa1 = Pin('A1', Pin.IN, Pin.PULL_UP)
     #pa6 = Pin('A6', Pin.IN, Pin.PULL_DOWN) # put output on ground
-    return pa7
+    return pa7     
 
-def graph():
-    volt = PrepareSPO2()
-    isPair = 0
-    loopBeforeDisplay = 10
-    loopNb = 0
-    backGroundNoise = 0
-    while True:
+def rtcToMs(rtcTime):
+    return rtcTime[3] * 86400000 + rtcTime[4] * 3600000 + rtcTime[5] * 60000 + rtcTime[6] * 1000 + rtcTime[7] // 1000
+
+def callback(p):
+    global menuSelected
+    global lastCall
+    currentTime = rtcToMs(rtc.datetime())
+    if (currentTime - rtcToMs(lastCall) > 180):
+        menuSelected += 1
+        menuSelected %= 4
+        print(menuSelected)
+        lastCall = rtc.datetime()
+
+def initButtonCallback():
+    pa8 = Pin('A8', Pin.IN, Pin.PULL_UP)
+    pa8.irq(trigger=Pin.IRQ_FALLING, handler=callback)
+
+
+initButtonCallback()
+# graph values
+volt = PrepareSPO2()
+isPair = 0
+loopBeforeDisplay = 10
+loopNb = 0
+backGroundNoise = 0
+# end of graph values
+while True:
+    if menuSelected == 0:
+        amogus.LCDamogus()
+    elif menuSelected == 1:
         if isPair == 0:
             volt.value(0)
             time.sleep(0.005)
@@ -67,25 +78,7 @@ def graph():
         loopNb = loopNb % loopBeforeDisplay
         isPair += 1
         isPair = isPair % 2
-
-def rtcToMs(rtcTime):
-    return rtcTime[3] * 86400000 + rtcTime[4] * 3600000 + rtcTime[5] * 60000 + rtcTime[6] * 1000 + rtcTime[7] // 1000
-
-def callback(p):
-    global menuSelected
-    global lastCall
-    currentTime = rtcToMs(watch.rtc.datetime())
-    if (currentTime - rtcToMs(lastCall) > 180):
-        menuSelected += 1
-        menuSelected %= 4
-        print(menuSelected)
-        lastCall = watch.rtc.datetime()
-
-def initButtonCallback():
-    pa8 = Pin('A8', Pin.IN, Pin.PULL_UP)
-    pa8.irq(trigger=Pin.IRQ_FALLING, handler=callback)
-
-
-initButtonCallback()
-amogus.LCDamogus()
-#graph()
+    elif menuSelected == 2:
+        watch.ShowTime()
+    else:
+        ClearLCD()

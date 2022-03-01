@@ -16,4 +16,3 @@ def LCDamogus():
             main.oled.pixel(i, j, amogus[i][j])
     
     main.oled.show()
-
