@@ -60,25 +60,32 @@ loopBeforeDisplay = 10
 loopNb = 0
 backGroundNoise = 0
 # end of graph values
-while True:
-    if menuSelected == 0:
-        amogus.LCDamogus()
-    elif menuSelected == 1:
-        if isPair == 0:
-            volt.value(0)
-            time.sleep(0.005)
-            backGroundNoise = ADC('A1').read()
+def menus():
+    global isPair
+    global volt
+    global loopBeforeDisplay
+    global loopNb
+    global backGroundNoise
+    while True:
+        if menuSelected == 0:
+            amogus.LCDamogus()
+        elif menuSelected == 1:
+            if isPair == 0:
+                volt.value(0)
+                time.sleep(0.005)
+                backGroundNoise = ADC('A1').read()
+            else:
+                volt.value(1)
+                time.sleep(0.005)
+                plot.AddValue(ADC('A1').read() - backGroundNoise)
+                if loopNb <= 1:
+                    plot.DisplayValues()
+            loopNb += 1
+            loopNb = loopNb % loopBeforeDisplay
+            isPair += 1
+            isPair = isPair % 2
+        elif menuSelected == 2:
+            watch.ShowTime()
         else:
-            volt.value(1)
-            time.sleep(0.005)
-            plot.AddValue(ADC('A1').read() - backGroundNoise)
-            if loopNb <= 1:
-                plot.DisplayValues()
-        loopNb += 1
-        loopNb = loopNb % loopBeforeDisplay
-        isPair += 1
-        isPair = isPair % 2
-    elif menuSelected == 2:
-        watch.ShowTime()
-    else:
-        ClearLCD()
+            ClearLCD()
+            oled.show()
