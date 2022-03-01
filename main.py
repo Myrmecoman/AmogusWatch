@@ -44,7 +44,6 @@ def callback(p):
     if (currentTime - rtcToMs(lastCall) > 180):
         menuSelected += 1
         menuSelected %= 4
-        print(menuSelected)
         lastCall = rtc.datetime()
 
 def initButtonCallback():
