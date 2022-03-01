@@ -59,6 +59,12 @@ loopBeforeDisplay = 10
 loopNb = 0
 backGroundNoise = 0
 # end of graph values
+# amogus position
+lastx = 1
+susx = 0
+lasty = 1
+susy = 0
+# end of amogus position
 def menus():
     global isPair
     global volt
