@@ -13,6 +13,7 @@ from pyb import ADC
 from pyb import Pin
 
 
+menuSelected = 0
 i2c = machine.SoftI2C(scl=machine.Pin('B8'), sda=machine.Pin('B9'))
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
@@ -66,6 +67,17 @@ def graph():
         isPair += 1
         isPair = isPair % 2
 
+def callback(p):
+    global menuSelected
+    menuSelected += 1
+    menuSelected %= 4
+    print(menuSelected)
 
+def initButtonCallback():
+    pa8 = Pin('A8', Pin.IN, Pin.PULL_UP)
+    pa8.irq(trigger=Pin.IRQ_FALLING, handler=callback)
+
+
+initButtonCallback()
 amogus.LCDamogus()
-graph()
+#graph()
