@@ -28,11 +28,17 @@ def ClearLCD():
     oled.fill(0)
 
 def PrepareSPO2():
-    pa7 = machine.Pin('A7', machine.Pin.OUT)
+    pa7 = Pin('A7', Pin.OUT)
     pa7.value(1)
     pa1 = Pin('A1', Pin.IN, Pin.PULL_UP)
     #pa6 = Pin('A6', Pin.IN, Pin.PULL_DOWN) # put output on ground
-    return pa7     
+    return pa7
+
+def PreparePmetre():
+    pa0 = Pin('A0', Pin.OUT)
+    pa0.value(1)
+    pa2 = Pin('A2', Pin.IN, Pin.PULL_UP)
+    return pa0
 
 def rtcToMs(rtcTime):
     return rtcTime[3] * 86400000 + rtcTime[4] * 3600000 + rtcTime[5] * 60000 + rtcTime[6] * 1000 + rtcTime[7] // 1000
@@ -59,6 +65,9 @@ loopBeforeDisplay = 10
 loopNb = 0
 backGroundNoise = 0
 # end of graph values
+# potentiometer
+pmetr = PreparePmetre()
+# end of potentiometer
 # amogus position
 lastx = 1
 susx = 0
@@ -92,5 +101,18 @@ def menus():
         elif menuSelected == 2:
             watch.ShowTime()
         else:
-            ClearLCD()
-            oled.show()
+            pmetr.value(1)
+            v = ADC('A2').read()
+            if (v < 44):
+                pyb.LED(2).off()
+                pyb.LED(3).off()
+                pyb.LED(1).on()
+            elif (v < 88):
+                pyb.LED(1).off()
+                pyb.LED(3).off()
+                pyb.LED(2).on()
+            else:
+                pyb.LED(1).off()
+                pyb.LED(2).off()
+                pyb.LED(3).on()
+            pmetr.value(0)
