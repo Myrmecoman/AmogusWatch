@@ -14,6 +14,7 @@ from pyb import Pin
 
 
 menuSelected = 0
+lastCall = watch.rtc.datetime()
 i2c = machine.SoftI2C(scl=machine.Pin('B8'), sda=machine.Pin('B9'))
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
@@ -67,11 +68,18 @@ def graph():
         isPair += 1
         isPair = isPair % 2
 
+def rtcToMs(rtcTime):
+    return rtcTime[3] * 86400000 + rtcTime[4] * 3600000 + rtcTime[5] * 60000 + rtcTime[6] * 1000 + rtcTime[7] // 1000
+
 def callback(p):
     global menuSelected
-    menuSelected += 1
-    menuSelected %= 4
-    print(menuSelected)
+    global lastCall
+    currentTime = rtcToMs(watch.rtc.datetime())
+    if (currentTime - rtcToMs(lastCall) > 180):
+        menuSelected += 1
+        menuSelected %= 4
+        print(menuSelected)
+        lastCall = watch.rtc.datetime()
 
 def initButtonCallback():
     pa8 = Pin('A8', Pin.IN, Pin.PULL_UP)

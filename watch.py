@@ -1,12 +1,15 @@
-import main
 import time
 import machine 
 
 now = (2020, 1, 21, 2, 10, 32, 36, 0)
 
+rtc = machine.RTC()
+rtc.datetime(now)
+
+import main
+
 def ShowTime():
-    rtc = machine.RTC()
-    rtc.datetime(now)
+    global rtc
     while True:
         main.oled.fill(0)
         t = rtc.datetime()
