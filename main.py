@@ -67,6 +67,9 @@ backGroundNoise = 0
 # end of graph values
 # potentiometer
 pmetr = PreparePmetre()
+valuesQueue = []
+detectedMin = 5000
+detectedMax = 0
 # end of potentiometer
 # amogus position
 lastx = 1
@@ -80,6 +83,10 @@ def menus():
     global loopBeforeDisplay
     global loopNb
     global backGroundNoise
+    global pmetr
+    global valuesQueue
+    global detectedMin
+    global detectedMax
     while True:
         if menuSelected == 0:
             amogus.LCDamogus()
@@ -101,13 +108,16 @@ def menus():
         elif menuSelected == 2:
             watch.ShowTime()
         else:
+            oled.fill(0)
+            oled.show()
             pmetr.value(1)
+            time.sleep(0.01)
             v = ADC('A2').read()
-            if (v < 44):
+            if (v < detectedMin + (detectedMax - detectedMin)/3):
                 pyb.LED(2).off()
                 pyb.LED(3).off()
                 pyb.LED(1).on()
-            elif (v < 88):
+            elif (v < detectedMin + (2 * (detectedMax - detectedMin))/3):
                 pyb.LED(1).off()
                 pyb.LED(3).off()
                 pyb.LED(2).on()
@@ -115,4 +125,15 @@ def menus():
                 pyb.LED(1).off()
                 pyb.LED(2).off()
                 pyb.LED(3).on()
+
+            # calibrating potentiometer
+            valuesQueue.append(v)
+            if len(valuesQueue) > 10:
+                del valuesQueue[0]
+            mostFrequent = max(set(valuesQueue), key = valuesQueue.count)
+            if mostFrequent < detectedMin:
+                detectedMin = mostFrequent
+            if mostFrequent > detectedMax:
+                detectedMax = mostFrequent
+            
             pmetr.value(0)
