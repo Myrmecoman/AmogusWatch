@@ -4,13 +4,14 @@
 import watch
 import plot
 import amogus
-#import _thread # can't import for some reason
+import pong
 import pyb
 import machine
 import ssd1306
 import time
 from pyb import ADC
 from pyb import Pin
+#import _thread # can't import for some reason
 
 
 now = (2020, 1, 21, 2, 10, 32, 36, 0)
@@ -67,16 +68,8 @@ backGroundNoise = 0
 # end of graph values
 # potentiometer
 pmetr = PreparePmetre()
-valuesQueue = []
-detectedMin = 5000
-detectedMax = 0
+
 # end of potentiometer
-# amogus position
-lastx = 1
-susx = 0
-lasty = 1
-susy = 0
-# end of amogus position
 def menus():
     global isPair
     global volt
@@ -108,32 +101,7 @@ def menus():
         elif menuSelected == 2:
             watch.ShowTime()
         else:
-            oled.fill(0)
-            oled.show()
             pmetr.value(1)
             time.sleep(0.01)
-            v = ADC('A2').read()
-            if (v < detectedMin + (detectedMax - detectedMin)/3):
-                pyb.LED(2).off()
-                pyb.LED(3).off()
-                pyb.LED(1).on()
-            elif (v < detectedMin + (2 * (detectedMax - detectedMin))/3):
-                pyb.LED(1).off()
-                pyb.LED(3).off()
-                pyb.LED(2).on()
-            else:
-                pyb.LED(1).off()
-                pyb.LED(2).off()
-                pyb.LED(3).on()
-
-            # calibrating potentiometer
-            valuesQueue.append(v)
-            if len(valuesQueue) > 10:
-                del valuesQueue[0]
-            mostFrequent = max(set(valuesQueue), key = valuesQueue.count)
-            if mostFrequent < detectedMin:
-                detectedMin = mostFrequent
-            if mostFrequent > detectedMax:
-                detectedMax = mostFrequent
-            
+            pong.DisplaySprites()
             pmetr.value(0)
