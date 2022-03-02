@@ -1,39 +1,33 @@
 import main
 import pyb
 
+
 playerPos = 32
 ballx = 64
 bally = 32
-lastx = 1
-lasty = 1
+speedx = 1
+speedy = 1
 
 valuesQueue = []
 detectedMin = 5000
 detectedMax = 0
 
+
+def DrawRect(x0, y0, x1, y1):
+    for i in range(x0, x1 + 1):
+        main.oled.line(i, y0, i, y1, 1)
+
 def DisplaySprites():
     global playerPos
     global ballx
-    global lastx
+    global speedx
     global bally
-    global lasty
+    global speedy
     global valuesQueue
     global detectedMin
     global detectedMax
 
     v = pyb.ADC('A2').read()
-    if (v < detectedMin + (detectedMax - detectedMin)/3):
-        pyb.LED(2).off()
-        pyb.LED(3).off()
-        pyb.LED(1).on()
-    elif (v < detectedMin + (2 * (detectedMax - detectedMin))/3):
-        pyb.LED(1).off()
-        pyb.LED(3).off()
-        pyb.LED(2).on()
-    else:
-        pyb.LED(1).off()
-        pyb.LED(2).off()
-        pyb.LED(3).on()
 
     # calibrating potentiometer
     valuesQueue.append(v)
@@ -54,10 +48,10 @@ def DisplaySprites():
     elif normalized > 1:
         normalized = 1
     screenPos = int(normalized * 64)
-    #print(screenPos)
     main.oled.fill(0)
-    main.oled.line(0, 0, 127, 0, 1)
-    main.oled.line(0, 63, 127, 63, 1)
-    main.oled.line(127, 0, 127, 63, 1)
-    main.oled.fill_rect(0, screenPos - 5, 4, screenPos + 5, 1)
+    main.oled.line(0, 0, 127, 0, 1)                      # top line
+    main.oled.line(0, 63, 127, 63, 1)                    # bottom line
+    main.oled.line(127, 0, 127, 63, 1)                   # right line
+    DrawRect(0, screenPos - 6, 3, screenPos + 6)         # player
+    DrawRect(ballx - 1, bally - 1, ballx + 1, bally + 1) # ball
     main.oled.show()
