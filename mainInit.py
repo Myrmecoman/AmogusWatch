@@ -60,8 +60,7 @@ def initButtonCallback():
 initButtonCallback()
 # graph values
 volt = PrepareSPO2()
-isPair = 0
-loopBeforeDisplay = 10
+loopBeforeDisplay = 5
 loopNb = 0
 backGroundNoise = 0
 # end of graph values
@@ -70,7 +69,6 @@ pmetr = PreparePmetre()
 
 # end of potentiometer
 def menus():
-    global isPair
     global volt
     global loopBeforeDisplay
     global loopNb
@@ -83,20 +81,16 @@ def menus():
         if menuSelected == 0:
             amogus.LCDamogus()
         elif menuSelected == 1:
-            if isPair == 0:
-                volt.value(0)
-                time.sleep(0.005)
-                backGroundNoise = ADC('A1').read()
-            else:
-                volt.value(1)
-                time.sleep(0.005)
-                plot.AddValue(ADC('A1').read() - backGroundNoise)
-                if loopNb <= 1:
-                    plot.DisplayValues()
+            volt.value(0)
+            time.sleep(0.005)
+            backGroundNoise = ADC('A1').read()
+            volt.value(1)
+            time.sleep(0.005)
+            plot.AddValue(ADC('A1').read() - backGroundNoise)
+            if loopNb >= loopBeforeDisplay - 1:
+                plot.DisplayValues()
             loopNb += 1
             loopNb = loopNb % loopBeforeDisplay
-            isPair += 1
-            isPair = isPair % 2
         elif menuSelected == 2:
             watch.ShowTime()
         else:
