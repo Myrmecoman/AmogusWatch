@@ -41,17 +41,32 @@ def PreparePmetre():
     pa2 = Pin('A2', Pin.IN, Pin.PULL_UP)
     return pa0
 
+# potentiometer
+pmetr = PreparePmetre()
+calibrated = False
+calibrating = False
+clic = False
+minP = -1
+maxP = -1
+# end of potentiometer
+
 def rtcToMs(rtcTime):
     return rtcTime[3] * 86400000 + rtcTime[4] * 3600000 + rtcTime[5] * 60000 + rtcTime[6] * 1000 + rtcTime[7] // 1000
 
 def callback(p):
     global menuSelected
     global lastCall
+    global clic
+    global calibrating
     currentTime = rtcToMs(rtc.datetime())
     if (currentTime - rtcToMs(lastCall) > 180):
-        menuSelected += 1
-        menuSelected %= 4
-        lastCall = rtc.datetime()
+        print(clic)
+        if (not(calibrating)):
+            menuSelected += 1
+            menuSelected %= 4
+            lastCall = rtc.datetime()
+        else:
+            clic = not(clic)
 
 def initButtonCallback():
     pa8 = Pin('A8', Pin.IN, Pin.PULL_UP)
@@ -66,10 +81,7 @@ loopBeforeDisplay = 10
 loopNb = 0
 backGroundNoise = 0
 # end of graph values
-# potentiometer
-pmetr = PreparePmetre()
 
-# end of potentiometer
 def menus():
     global isPair
     global volt
@@ -77,6 +89,11 @@ def menus():
     global loopNb
     global backGroundNoise
     global pmetr
+    global calibrated
+    global calibrating
+    global clic
+    global minP
+    global maxP
     global valuesQueue
     global detectedMin
     global detectedMax
@@ -101,7 +118,45 @@ def menus():
         elif menuSelected == 2:
             watch.ShowTime()
         else:
-            pmetr.value(1)
-            time.sleep(0.01)
-            pong.DisplaySprites()
-            pmetr.value(0)
+            if calibrated:
+                pmetr.value(1)
+                time.sleep(0.01)
+                pong.DisplaySprites(minP, maxP)
+                pmetr.value(0)
+            else:
+                calibrating = True
+                if minP == -1:
+                    minV = []
+                    ClearLCD()
+                    oled.text("Press button", 0, 16)
+                    oled.text("when on min", 0, 32)
+                    oled.show()
+                    while clic:
+                        ClearLCD()
+                        oled.text("Press again", 0, 16)
+                        oled.text("after 3 secs", 0, 32)
+                        oled.show()
+                        minV.append(pyb.ADC('A2').read())
+                    if minV != []:
+                        minP = int(sum(minV)/len(minV))
+                    time.sleep(0.5)
+                elif maxP == -1:
+                    maxV = []
+                    ClearLCD()
+                    oled.text("Press button", 0, 16)
+                    oled.text("when on max", 0, 32)
+                    oled.show()
+                    while clic:
+                        ClearLCD()
+                        oled.text("Press again", 0, 16)
+                        oled.text("after 3 secs", 0, 32)
+                        oled.show()
+                        maxV.append(pyb.ADC('A2').read())
+                    if maxV != []:
+                        maxP = int(sum(maxV)/len(maxV))
+                else:
+                    if (minP > maxP):
+                        (minP, maxP) = (maxP, minP)
+                    print("min:" + str(minP) + "    max:" + str(maxP))
+                    calibrating = False
+                    calibrated = True
