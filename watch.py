@@ -1,5 +1,5 @@
 import time
-import main
+import mainInit as main
 
 def ShowTime():
     main.oled.fill(0)

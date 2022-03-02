@@ -1,4 +1,4 @@
-import main
+import mainInit as main
 
 
 lastx = 1
