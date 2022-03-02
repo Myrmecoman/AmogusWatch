@@ -1,5 +1,6 @@
 # CTRL-D to reboot
 
+import BLE
 import watch
 import plot
 import amogus
@@ -49,7 +50,7 @@ def callback(p):
     currentTime = rtcToMs(rtc.datetime())
     if (currentTime - rtcToMs(lastCall) > 180):
         menuSelected += 1
-        menuSelected %= 4
+        menuSelected %= 5
         lastCall = rtc.datetime()
 
 def initButtonCallback():
@@ -77,6 +78,9 @@ def menus():
     global valuesQueue
     global detectedMin
     global detectedMax
+
+    ble = BLE.STM32_BLE("STM32BLE")
+
     while True:
         if menuSelected == 0:
             amogus.LCDamogus()
@@ -93,9 +97,29 @@ def menus():
             loopNb = loopNb % loopBeforeDisplay
         elif menuSelected == 2:
             watch.ShowTime()
-        else:
+        elif menuSelected == 3:
             pmetr.value(1)
             time.sleep(0.01)
             pong.DisplaySprites()
             pmetr.value(0)
+        else:
+            oled.fill(0)
+            oled.text('BLE testing', 0, 5)
+            oled.show()
 
+            if not BLE.connected:
+                continue
+
+            if BLE.ble_msg == '':
+                ble.send('test')
+                print('sending test')
+                time.sleep(0.9)
+            if BLE.ble_msg == 'test':
+                print(BLE.ble_msg)
+                BLE.ble_msg = ''
+                ble.send('received msg')
+            if BLE.ble_msg == 'received msg':
+                print('received msg confirmation of reception')
+                BLE.ble_msg = ''
+            
+            time.sleep(0.1)
