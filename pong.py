@@ -2,11 +2,13 @@ import mainInit as main
 import pyb
 
 
+score = 0
+
 playerPos = 32
 ballx = 64
 bally = 32
-speedx = 1
-speedy = 1
+speedx = 2
+speedy = 2
 
 valuesQueue = []
 detectedMin = 5000
@@ -26,6 +28,20 @@ def DisplaySprites():
     global valuesQueue
     global detectedMin
     global detectedMax
+
+    if ballx < 125 and speedx == 2:
+        ballx += 2
+    elif ballx > 2 and speedx == -2:
+        ballx -= 2
+    else:
+        speedx = -speedx
+
+    if bally < 61 and speedy == 2:
+        bally += 2
+    elif bally > 2 and speedy == -2:
+        bally -= 2
+    else:
+        speedy = -speedy
 
     v = pyb.ADC('A2').read()
 
@@ -54,4 +70,5 @@ def DisplaySprites():
     main.oled.line(127, 0, 127, 63, 1)                   # right line
     DrawRect(0, screenPos - 6, 3, screenPos + 6)         # player
     DrawRect(ballx - 1, bally - 1, ballx + 1, bally + 1) # ball
+    main.oled.text(str(score), 64, 5)
     main.oled.show()
