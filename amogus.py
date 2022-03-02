@@ -15,14 +15,14 @@ def LCDamogus():
     
     if susx < 100 and lastx == 1:
         susx += 2
-    elif susx > 0 and lastx == -1:
+    elif susx > -2 and lastx == -1:
         susx -= 2
     else:
         lastx = -lastx
 
     if susy < 25 and lasty == 1:
         susy += 1
-    elif susy > 0 and lasty == -1:
+    elif susy > -5 and lasty == -1:
         susy -= 1
     else:
         lasty = -lasty

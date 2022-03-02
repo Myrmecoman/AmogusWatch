@@ -46,10 +46,18 @@ def DisplaySprites():
         detectedMax = mostFrequent
 
     diff = detectedMax - detectedMin
-    if diff == 0:
-        diff = 1
+    if diff <= 0:
+        diff = 4096
     normalized = (v - detectedMin) / diff
+    if normalized < 0:
+        normalized = 0
+    elif normalized > 1:
+        normalized = 1
     screenPos = int(normalized * 64)
+    #print(screenPos)
     main.oled.fill(0)
+    main.oled.line(0, 0, 127, 0, 1)
+    main.oled.line(0, 63, 127, 63, 1)
+    main.oled.line(127, 0, 127, 63, 1)
     main.oled.fill_rect(0, screenPos - 5, 4, screenPos + 5, 1)
     main.oled.show()
