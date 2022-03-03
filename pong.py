@@ -37,7 +37,7 @@ def DisplaySprites():
         ballx -= 2
     else:
         if speedx < 0: # missed the ball
-            score += 1
+            score = 0
             ballx = 64
             bally = 32
             speedx = 2
@@ -56,6 +56,7 @@ def DisplaySprites():
     yDist = abs(playerPos - bally)
     if ballx < 5 and speedx == -2 and yDist < 6:
         speedx = -speedx
+        score += 1
 
     v = pyb.ADC('A2').read()
 
@@ -84,5 +85,5 @@ def DisplaySprites():
     main.oled.line(127, 0, 127, 63, 1)                   # right line
     DrawRect(0, playerPos - 6, 2, playerPos + 6)         # player
     DrawRect(ballx - 1, bally - 1, ballx + 1, bally + 1) # ball
-    main.oled.text(str(score), 64, 5)
+    main.oled.text(str(score), 62, 5)
     main.oled.show()

@@ -5,6 +5,7 @@ import watch
 import plot
 import amogus
 import pong
+import pongBLE
 import pyb
 import machine
 import ssd1306
@@ -50,7 +51,7 @@ def callback(p):
     currentTime = rtcToMs(rtc.datetime())
     if (currentTime - rtcToMs(lastCall) > 180):
         menuSelected += 1
-        menuSelected %= 5
+        menuSelected %= 6
         lastCall = rtc.datetime()
 
 def initButtonCallback():
@@ -97,8 +98,11 @@ def menus():
             watch.ShowTime()
         elif menuSelected == 3:
             pmetr.value(1)
-            time.sleep(0.01)
             pong.DisplaySprites()
+            pmetr.value(0)
+        elif menuSelected == 4:
+            pmetr.value(1)
+            pongBLE.Play()
             pmetr.value(0)
         else:
             BLE.BLEloop()
