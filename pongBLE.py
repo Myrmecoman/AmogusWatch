@@ -11,6 +11,19 @@ bleChosen = -1
 serverInc = 0
 clientInc = 0
 
+scoreServer = 0
+scoreClient = 0
+serverPos = 32
+clientPos = 32
+ballx = 64
+bally = 32
+speedx = 2
+speedy = 2
+
+def DrawRect(x0, y0, x1, y1):
+    for i in range(x0, x1 + 1):
+        main.oled.line(i, y0, i, y1, 1)
+
 def displayChoice(value):
     global bleChosen
     global serverInc
@@ -48,20 +61,22 @@ def displayChoice(value):
     main.oled.show()
 
 def LoadServer():
-    main.oled.fill(0)
     main.oled.text('server', 0, 5)
-    main.oled.show()
 
 def LoadClient():
-    main.oled.fill(0)
     main.oled.text('client', 0, 5)
-    main.oled.show()
 
 def Play():
     global bleChosen
     global valuesQueue
     global detectedMin
     global detectedMax
+    global scoreServer
+    global scoreClient
+    global serverPos
+    global clientPos
+    global ballx
+    global bally
 
     v = pyb.ADC('A2').read()
 
@@ -86,10 +101,19 @@ def Play():
 
     if bleChosen == -1:
         displayChoice(normalized)
-        return
-    elif bleChosen == 0:
-        LoadServer()
-    elif bleChosen == 1:
-        LoadClient()
     else:
-        print('ERROR while choosing multiplayer pong')
+        main.oled.fill(0)
+        main.oled.line(0, 0, 127, 0, 1)    # wall
+        main.oled.line(0, 63, 127, 63, 1)  # wall
+        main.oled.text(str(scoreServer), 53, 5) # server score
+        main.oled.text(str(scoreClient), 65, 5) # client score
+
+        if bleChosen == 0:
+            LoadServer()
+        else:
+            LoadClient()
+
+        DrawRect(0, serverPos - 6, 2, serverPos + 6)         # server sprite
+        DrawRect(125, clientPos - 6, 127, clientPos + 6)     # client sprite
+        DrawRect(ballx - 1, bally - 1, ballx + 1, bally + 1) # ball
+        main.oled.show()
