@@ -1,4 +1,5 @@
 import mainInit as main
+import time
 import pyb
 
 
@@ -6,30 +7,54 @@ valuesQueue = []
 detectedMin = 5000
 detectedMax = 0
 
-bleChosen = False
+bleChosen = -1
+serverInc = 0
+clientInc = 0
 
 def displayChoice(value):
+    global bleChosen
+    global serverInc
+    global clientInc
+
     main.oled.fill(0)
     main.oled.text('server', 40, 10)
     main.oled.text('client', 40, 25)
-    main.oled.text('skip', 40, 40)
+    time.sleep(0.1)
 
-    if (value < 0.33):
+    if (value < 0.5):
         main.oled.line(39, 11, 95, 11, 1)
         main.oled.line(39, 17, 95, 17, 1)
         main.oled.line(39, 17, 39, 11, 1)
         main.oled.line(95, 17, 95, 11, 1)
-    elif (value < 0.67):
+        serverInc += 1
+        clientInc = 0
+    else:
         main.oled.line(39, 26, 95, 26, 1)
         main.oled.line(39, 32, 95, 32, 1)
         main.oled.line(39, 32, 39, 26, 1)
         main.oled.line(95, 32, 95, 26, 1)
-    else:
-        main.oled.line(39, 41, 95, 41, 1)
-        main.oled.line(39, 47, 95, 47, 1)
-        main.oled.line(39, 47, 39, 41, 1)
-        main.oled.line(95, 47, 95, 41, 1)
+        clientInc += 1
+        serverInc = 0
 
+    if serverInc >= 50:
+        bleChosen = 0
+        serverInc = 0
+        clientInc = 0
+    if clientInc >= 50:
+        bleChosen = 1
+        serverInc = 0
+        clientInc = 0
+
+    main.oled.show()
+
+def LoadServer():
+    main.oled.fill(0)
+    main.oled.text('server', 0, 5)
+    main.oled.show()
+
+def LoadClient():
+    main.oled.fill(0)
+    main.oled.text('client', 0, 5)
     main.oled.show()
 
 def Play():
@@ -59,6 +84,12 @@ def Play():
     elif normalized > 1:
         normalized = 1
 
-    if not bleChosen:
+    if bleChosen == -1:
         displayChoice(normalized)
         return
+    elif bleChosen == 0:
+        LoadServer()
+    elif bleChosen == 1:
+        LoadClient()
+    else:
+        print('ERROR while choosing multiplayer pong')

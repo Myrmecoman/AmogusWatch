@@ -49,6 +49,11 @@ def callback(p):
     global menuSelected
     global lastCall
     currentTime = rtcToMs(rtc.datetime())
+
+    # reset blePong variable
+    if menuSelected != 4:
+        pongBLE.bleChosen = -1
+
     if (currentTime - rtcToMs(lastCall) > 180):
         menuSelected += 1
         menuSelected %= 6
