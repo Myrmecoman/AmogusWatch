@@ -43,6 +43,10 @@ _UART_TX_CHAR_UUID = bluetooth.UUID("6E400003-B5A3-F393-E0A9-E50E24DCCA9E")
 adresse_MAC = 0 # Adresse matérielle de la radio BLE du central
 AR_central_requis = 0 # Est-ce que le central doit envoyer un accusé de réception au périphérique ?
 
+
+receipt = []
+
+
 # Classe pour gérer le Central BLE
 class BLECentral:
 
@@ -221,11 +225,12 @@ def on_receipt(v):
 	# On convertit les octets reçus en caractères codés au format UTF-8
 	payload = b.decode('utf-8')
 	print("Message recu de " + str(adresse_MAC) + " : ", payload)
-	print("Payload : " + payload)
-
+	liste = float(payload)
 	# Le central a bien reçu un message du périphérique, donc il doit lui envoyer un accusé de réception
 	global AR_central_requis
 	AR_central_requis = 1
+	global receipt
+	receipt = liste
 
 # Création d'une instance de la classe central
 ble = bluetooth.BLE()
@@ -276,7 +281,8 @@ def demo():
 	while central.is_connected():
 		if AR_central_requis == 1:
 			try: # Essaie d'envoyer un message
-				v = "AR de " + adresse_MAC 
+				print(receipt)
+				v = str(int(receipt)**2)
 				central.write(v)
 			except: # En cas d'échec...
 				print("Echec d'émission de la réponse du central")
