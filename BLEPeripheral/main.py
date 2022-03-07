@@ -6,7 +6,8 @@
 # Le périphérique envoie au central une chaîne de caractères contenant la température, l'humidité et la pression.
 
 import bluetooth # Classes "primitives du BLE"
-from ble_advertising import advertising_payload # Pour construire la trame d'advertising
+import ble_advertising
+import random
 from binascii import hexlify # Convertit une donnée binaire en sa représentation hexadécimale
 
 # Constantes requises pour construire le service BLE UART
@@ -49,7 +50,7 @@ class BLEUART:
 		self._rx_buffer = bytearray()
 		self._handler = None
 		# Advertising du service (services=[_UART_UUID] est indispensable pour que le central identifie le service)
-		self._payload = advertising_payload(name=name, services=[_UART_UUID])
+		self._payload = ble_advertising.advertising_payload(name=name, services=[_UART_UUID])
 		self._advertise()
 		
 		# Affiche l'adresse MAC de l'objet
@@ -146,17 +147,15 @@ def demo():
 		while True:
 		
 			# Conversion en texte des valeurs renvoyées par les capteurs
-			stemp = 'temp'
-			shumi = 'humi'
-			spres = 'pressure'
+			stemp = str(random.uniform(0, 10))
 
 			# Affichage sur le port série de l'USB USER
-			print("Température : " + stemp + " °C, Humidité relative : " + shumi + " %, Pression : " + spres + " hPa")
+			print(stemp)
 
 			if uart.is_connected():
 
 				# On concatène les données :
-				data = stemp + "|" + shumi + "|" + spres
+				data = stemp
 
 				# On les envoie au central (ie on les notifie dans TX):
 				uart.write(data)
@@ -164,7 +163,7 @@ def demo():
 				print("Données envoyées au central : " + data)
 
 			# Temporisation de 5 secondes
-			time.sleep_ms(5000)
+			time.sleep_ms(2000)
 
 	# Si l'utilisateur appuie sur CTRL+C
 	except KeyboardInterrupt:
