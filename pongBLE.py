@@ -1,7 +1,10 @@
 import mainInit as main
 import time
+import pongServer
+import pongClient
 import pyb
 
+uart = None
 
 valuesQueue = []
 detectedMin = 5000
@@ -28,6 +31,7 @@ def displayChoice(value):
     global bleChosen
     global serverInc
     global clientInc
+    global uart
 
     main.oled.fill(0)
     main.oled.text('server', 40, 10)
@@ -50,21 +54,28 @@ def displayChoice(value):
         serverInc = 0
 
     if serverInc >= 50:
+        uart = pongServer.setup()
         bleChosen = 0
         serverInc = 0
         clientInc = 0
     if clientInc >= 50:
+        pongClient.setup()
         bleChosen = 1
         serverInc = 0
         clientInc = 0
 
     main.oled.show()
 
-def LoadServer():
-    main.oled.text('server', 0, 5)
 
-def LoadClient():
+def playServer():
+    main.oled.text('server', 0, 5)
+    pongServer.peripheralBLE(uart)
+
+
+def playClient():
     main.oled.text('client', 0, 5)
+    pongClient.centralBLE()
+
 
 def Play():
     global bleChosen
@@ -109,9 +120,9 @@ def Play():
         main.oled.text(str(scoreClient), 65, 5) # client score
 
         if bleChosen == 0:
-            LoadServer()
+            playServer()
         else:
-            LoadClient()
+            playClient()
 
         DrawRect(0, serverPos - 6, 2, serverPos + 6)         # server sprite
         DrawRect(125, clientPos - 6, 127, clientPos + 6)     # client sprite

@@ -7,8 +7,9 @@
 
 import bluetooth # Classes "primitives du BLE"
 import ble_advertising
-import random
 from binascii import hexlify # Convertit une donnée binaire en sa représentation hexadécimale
+import time
+import pongBLE
 
 # Constantes requises pour construire le service BLE UART
 _IRQ_CENTRAL_CONNECT = const(1)
@@ -122,13 +123,8 @@ class BLEUART:
 		return len(self._connections) > 0
 
 
-# Programme principal
-def demo():
-
-	print("Périphérique BLE")
-
-	# Pause d'une seconde pour laisser à l'I2C le temps de s'initialiser
-	import time
+def setup():
+	print("Pong server")
 	time.sleep_ms(1000)
 
 	# Instanciation du BLE
@@ -137,41 +133,26 @@ def demo():
 
 	# Gestionnaire de l'évènement de réception
 	def on_rx():
-		print("Données reçues du central : ", uart.read().decode().strip())
-
+		packet = uart.read().decode().strip()
+		print("Donnée reçue du client : " + packet)
+		pongBLE.clientPos = int(packet)
+		
 	# Réception (asynchrone) des données (ie réaction aux écritures du central dans RX).
 	uart.irq(handler=on_rx)
 
-	# Structure de gestion des erreurs pour gérer les interruptions du clavier
-	try:
-		while True:
-		
-			# Conversion en texte des valeurs renvoyées par les capteurs
-			stemp = str(random.uniform(0, 10))
+	return uart
 
-			# Affichage sur le port série de l'USB USER
-			print(stemp)
 
-			if uart.is_connected():
+def stop(uart):
+	print("Disconnected")
 
-				# On concatène les données :
-				data = stemp
 
-				# On les envoie au central (ie on les notifie dans TX):
-				uart.write(data)
+# Programme principal
+def peripheralBLE(uart):
+	if uart.is_connected():
+		packet = str(pongBLE.serverPos) + '|' + str(pongBLE.ballx) + '|' + str(pongBLE.bally) + '|' + str(pongBLE.scoreServer) + '|' + str(pongBLE.scoreClient)
+		data = packet
+		uart.write(data)
+		print("Données envoyées au central : " + data)
 
-				print("Données envoyées au central : " + data)
-
-			# Temporisation de 5 secondes
-			time.sleep_ms(2000)
-
-	# Si l'utilisateur appuie sur CTRL+C
-	except KeyboardInterrupt:
-		pass # On ferme la connexion avant de quitter
-
-	# Ferme l'UART actif
-	uart.close()
-
-# Si le nom du script est "main", exécute la fonction "demo()"
-if __name__ == "__main__":
-	demo()
+	time.sleep_ms(100) # Temporisation

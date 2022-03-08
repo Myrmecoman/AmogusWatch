@@ -11,6 +11,8 @@
 
 import bluetooth # Classes "primitives du BLE"
 from ble_advertising import decode_services, decode_name # Pour décoder les messages reçus
+import time
+import pongBLE
 
 # Constantes requises pour construire le service GATT BLE UART
 # Voir : https://docs.micropython.org/en/latest/library/ubluetooth.html
@@ -218,19 +220,18 @@ class BLECentral:
 # Gestionnaire de l'évènement de réception qui répond à une notification lorsque la caractéristique TX
 # est modifiée.
 def on_receipt(v):
+	global receipt
 	
 	# Conversion en octets de la charge utile de TX
 	b = bytes(v)
 
 	# On convertit les octets reçus en caractères codés au format UTF-8
 	payload = b.decode('utf-8')
-	print("Message recu de " + str(adresse_MAC) + " : ", payload)
-	liste = float(payload)
+	print("Message recu : " + payload)
+	receipt = payload.split('|')
 	# Le central a bien reçu un message du périphérique, donc il doit lui envoyer un accusé de réception
 	global AR_central_requis
 	AR_central_requis = 1
-	global receipt
-	receipt = liste
 
 # Création d'une instance de la classe central
 ble = bluetooth.BLE()
@@ -255,13 +256,9 @@ def on_scan(addr_type, addr, name):
 		aucun_peripherique = 1
 		print("Aucun périphérique trouvé.")
 
-# Programme principal
-def demo():
 
-	print("Central BLE")
-
-	import time # Pour gérér le temps et les temporisations
-
+def setup():
+	print("Pong client")
 	aucun_peripherique = 0
 
 	#Capture les évènements de scan
@@ -272,24 +269,28 @@ def demo():
 		time.sleep_ms(100)
 		if aucun_peripherique == 1:
 			return
-	print("Connecté")
+	
+	print("Connected")
  
 	# Capture les évènements de réception. La notification provient de la caractéristique TX.
 	central.on_notify(on_receipt)
 
+
+def stop():
+	print("Disconnected")
+
+
+# Programme principal
+def centralBLE():
 	# Envoi d'un message d'accusé de réception du central au périphérique
-	while central.is_connected():
+	if central.is_connected():
 		if AR_central_requis == 1:
 			try: # Essaie d'envoyer un message
-				print(receipt)
-				v = str(int(receipt)**2)
-				central.write(v)
+				pongBLE.serverPos   = int(receipt[0])
+				pongBLE.ballx       = int(receipt[1])
+				pongBLE.bally       = int(receipt[2])
+				pongBLE.scoreServer = int(receipt[3])
+				pongBLE.scoreClient = int(receipt[4])
+				central.write(str(pongBLE.clientPos))
 			except: # En cas d'échec...
-				print("Echec d'émission de la réponse du central")
-
-	# Pour le cas où le central se retrouverait déconnecté
-	print("Déconnecté")
-
-# Si le nom du script est "main", exécute la fonction "demo()"
-if __name__ == "__main__":
-	demo()
+				print("Echec d'émission de la réponse au server ou de parsing")

@@ -56,7 +56,7 @@ def callback(p):
 
     if (currentTime - rtcToMs(lastCall) > 180):
         menuSelected += 1
-        menuSelected %= 6
+        menuSelected %= 5
         lastCall = rtc.datetime()
 
 def initButtonCallback():
@@ -86,6 +86,10 @@ def menus():
     global detectedMax
 
     while True:
+
+        if menuSelected != 4 and pongBLE.uart is not None:
+            pongBLE.uart.close()
+
         if menuSelected == 0:
             amogus.LCDamogus()
         elif menuSelected == 1:
@@ -105,9 +109,7 @@ def menus():
             pmetr.value(1)
             pong.DisplaySprites()
             pmetr.value(0)
-        elif menuSelected == 4:
+        else:
             pmetr.value(1)
             pongBLE.Play()
             pmetr.value(0)
-        else:
-            BLE.BLEloop()
