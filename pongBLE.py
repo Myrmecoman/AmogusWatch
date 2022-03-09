@@ -68,10 +68,50 @@ def displayChoice(value):
 
 
 def playServer(normalized):
+    global uart
     global serverPos
+    global clientPos
+    global ballx
+    global bally
+    global speedx
+    global speedy
+
     serverPos = int(normalized * 64)
     main.oled.text('server', 0, 5)
-    playerPos = int(normalized * 64)
+
+    if uart is not None and uart.is_connected():
+        ballx += speedx
+        bally += speedy
+
+    # ball collision on walls
+    if bally < 2 and speedy == -2:
+        speedy = -speedy
+    if bally > 125 and speedy == 2:
+        speedy = -speedy
+
+    # ball collision on server
+    yDist = abs(serverPos - bally)
+    if ballx < 5 and speedx == -2 and yDist < 6:
+        speedx = -speedx
+    # ball collision on client
+    yDist = abs(clientPos - bally)
+    if ballx > 122 and speedx == 2 and yDist < 6:
+        speedx = -speedx
+    
+    # ball not catched
+    if ballx < 2:
+        scoreClient += 1
+        ballx = 64
+        bally = 32
+        speedx = 2
+        speedy = 2
+    if ballx > 125:
+        scoreServer += 1
+        ballx = 64
+        bally = 32
+        speedx = -2
+        speedy = 2
+    
     pongServer.peripheralBLE(uart)
 
 
