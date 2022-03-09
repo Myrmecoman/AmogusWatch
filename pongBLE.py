@@ -67,12 +67,17 @@ def displayChoice(value):
     main.oled.show()
 
 
-def playServer():
+def playServer(normalized):
+    global serverPos
+    serverPos = int(normalized * 64)
     main.oled.text('server', 0, 5)
+    playerPos = int(normalized * 64)
     pongServer.peripheralBLE(uart)
 
 
-def playClient():
+def playClient(normalized):
+    global clientPos
+    clientPos = int(normalized * 64)
     main.oled.text('client', 0, 5)
     pongClient.centralBLE()
 
@@ -120,9 +125,9 @@ def Play():
         main.oled.text(str(scoreClient), 65, 5) # client score
 
         if bleChosen == 0:
-            playServer()
+            playServer(normalized)
         else:
-            playClient()
+            playClient(normalized)
 
         DrawRect(0, serverPos - 6, 2, serverPos + 6)         # server sprite
         DrawRect(125, clientPos - 6, 127, clientPos + 6)     # client sprite
