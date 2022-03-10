@@ -69,6 +69,8 @@ def displayChoice(value):
 
 def playServer(normalized):
     global uart
+    global scoreServer
+    global scoreClient
     global serverPos
     global clientPos
     global ballx
@@ -84,18 +86,18 @@ def playServer(normalized):
         bally += speedy
 
     # ball collision on walls
-    if bally < 2 and speedy == -2:
+    if bally <= 2 and speedy == -2:
         speedy = -speedy
-    if bally > 125 and speedy == 2:
+    if bally >= 62 and speedy == 2:
         speedy = -speedy
 
     # ball collision on server
     yDist = abs(serverPos - bally)
-    if ballx < 5 and speedx == -2 and yDist < 6:
+    if ballx <= 5 and speedx == -2 and yDist < 6:
         speedx = -speedx
     # ball collision on client
     yDist = abs(clientPos - bally)
-    if ballx > 122 and speedx == 2 and yDist < 6:
+    if ballx >= 122 and speedx == 2 and yDist < 6:
         speedx = -speedx
     
     # ball not catched
